@@ -16,17 +16,13 @@ using System.Windows.Shapes;
 namespace SeaBattle
 {
     /// <summary>
-    /// Логика взаимодействия для MainWindow.xaml
+    /// Логика взаимодействия для StatusPanel.xaml
     /// </summary>
-    public partial class MainWindow : Window
+    public partial class StatusPanel : UserControl
     {
-        public MainWindow()
+        public StatusPanel()
         {
             InitializeComponent();
-
-
         }
-
-
     }
 }
