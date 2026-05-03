@@ -48,13 +48,14 @@ namespace SeaBattle
             var rect = grid.Children[index] as Rectangle;
             if (rect == null) return;
 
-            rect.Fill = state switch
-            {
-                CellState.Ship => Brushes.Gray,
-                CellState.Hit => Brushes.Red,
-                CellState.Miss => Brushes.White,
-                _ => Brushes.LightBlue
-            };
+            if (state == CellState.Ship)
+                rect.Fill = Brushes.Gray;
+            else if (state == CellState.Hit)
+                rect.Fill = Brushes.Red;
+            else if (state == CellState.Miss)
+                rect.Fill = Brushes.White;
+            else
+                rect.Fill = Brushes.LightBlue;
         }
 
         private void Grid_Click(object sender, MouseButtonEventArgs e)

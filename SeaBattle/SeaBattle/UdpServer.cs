@@ -17,10 +17,10 @@ namespace SeaBattle
 
         public event Action<string[]> OnMessageReceived;
 
-        public void Start()
+        public void Start(int port)
         {
             sock = new Socket(AddressFamily.InterNetwork, SocketType.Dgram, ProtocolType.Udp);
-            sock.Bind(new IPEndPoint(IPAddress.Any, 12345));
+            sock.Bind(new IPEndPoint(IPAddress.Any, port));
             clientEP = new IPEndPoint(IPAddress.Any, 0);
             ThreadPool.QueueUserWorkItem(_ => ReciveLoop());
         }

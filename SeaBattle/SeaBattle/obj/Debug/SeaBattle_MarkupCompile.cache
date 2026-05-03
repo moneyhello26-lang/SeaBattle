@@ -4,17 +4,17 @@
 winexe
 C#
 .cs
-C:\Users\baber\OneDrive\Документы\SeaBattle\SeaBattle\SeaBattle\obj\Debug\
+C:\Users\Stela\Documents\GitHub\SeaBattle\SeaBattle\SeaBattle\obj\Debug\
 SeaBattle
 none
 false
 DEBUG;TRACE
-C:\Users\baber\OneDrive\Документы\SeaBattle\SeaBattle\SeaBattle\App.xaml
+C:\Users\Stela\Documents\GitHub\SeaBattle\SeaBattle\SeaBattle\App.xaml
 5676318678
 
 13435543019
 13-1310406943
 BoardControl.xaml;MainWindow.xaml;RunClient.xaml;RunServer.xaml;StatusPanel.xaml;
 
-True
+False
 
