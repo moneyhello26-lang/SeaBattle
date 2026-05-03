@@ -23,6 +23,7 @@ namespace SeaBattle
         private UdpServer _server;
         private UdpClient _client;
         private GameState _state = new GameState();
+
         public MainWindow()
         {
             InitializeComponent();
@@ -56,6 +57,10 @@ namespace SeaBattle
             _state.MyName = dlg.UserName;
 
             _server = new UdpServer();
+            _server.OnMessageReceived += ProcessMessage; 
+            _server.Start(dlg.Port);
+
+            _state.IsMyTurn = true;
             statusPanel.SetTurn(true);
             statusPanel.AddLog("Сервер запущен. Ожидание противника...");
         }
@@ -65,6 +70,7 @@ namespace SeaBattle
             if (dlg.ShowDialog() != true) return;
             _state.MyName = dlg.NickName;
             _client = new UdpClient();
+            _client.OnMessageReceived += ProcessMessage;
             _client.Connect(dlg.ServerIP, dlg.Port);
 
             _state.IsMyTurn = false;
@@ -86,6 +92,12 @@ namespace SeaBattle
             });
         }
 
+        private void Send(string msg)
+        {
+            _server?.Send(msg);
+            _client?.Send(msg);
+        }
+
         private void HandleReady()
         {
             statusPanel.AddLog($"{_state.OpponentName} готов!");
@@ -103,11 +115,11 @@ namespace SeaBattle
         {
             int row = int.Parse(parts[1]);
             int col = int.Parse(parts[2]);
-            string result = parts[3];
+            string res = parts[3];
 
-            statusPanel.AddLog($"Результат выстрела в ({row}, {col}): {result}");
+            statusPanel.AddLog($"Результат выстрела в ({row}, {col}): {res}");
 
-            if (result == "miss")
+            if (res == "miss")
             {
                 _state.IsMyTurn = false;
                 statusPanel.SetTurn(false);
@@ -119,5 +131,7 @@ namespace SeaBattle
             statusPanel.AddLog($"Игра окончена!");
             MessageBox.Show("Победа!", "SeaBattle");
         }
+
+
     }
 }

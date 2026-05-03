@@ -23,6 +23,38 @@ namespace SeaBattle
         public BoardControl()
         {
             InitializeComponent();
+            BuildGrid();
+        }
+
+        private void BuildGrid()
+        {
+            for (int i = 0; i < GameProtocol.GRID_SIZE * GameProtocol.GRID_SIZE; i++)
+            {
+                var rect = new Rectangle
+                {
+                    Fill = Brushes.LightBlue,
+                    Stroke = Brushes.Navy,
+                    StrokeThickness = 1
+                };
+                grid.Children.Add(rect);
+            }
+        }
+
+        public void UpdateCell(int row, int col, CellState state)
+        {
+            int index = row * GameProtocol.GRID_SIZE + col;
+            if (index >= grid.Children.Count) return;
+
+            var rect = grid.Children[index] as Rectangle;
+            if (rect == null) return;
+
+            rect.Fill = state switch
+            {
+                CellState.Ship => Brushes.Gray,
+                CellState.Hit => Brushes.Red,
+                CellState.Miss => Brushes.White,
+                _ => Brushes.LightBlue
+            };
         }
 
         private void Grid_Click(object sender, MouseButtonEventArgs e)

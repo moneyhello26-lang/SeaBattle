@@ -35,6 +35,10 @@ namespace SeaBattle
                 OnMessageReceived?.Invoke(parts);
             }
         }
+        public void Send(string msg)
+        {
+            _sock.Send(Encoding.UTF8.GetBytes(msg));
+        }
 
     }
 }

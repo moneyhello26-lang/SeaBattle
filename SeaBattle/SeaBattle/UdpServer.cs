@@ -15,6 +15,8 @@ namespace SeaBattle
         private Socket sock;
         private EndPoint clientEP;
 
+        public event Action<string[]> OnMessageReceived;
+
         public void Start()
         {
             sock = new Socket(AddressFamily.InterNetwork, SocketType.Dgram, ProtocolType.Udp);
@@ -29,12 +31,18 @@ namespace SeaBattle
             while (true)
             {
                 int received = sock.ReceiveFrom(buffer, ref clientEP);
-                string message = Encoding.UTF8.GetString(buffer, 0, received);
-                Console.WriteLine($"Received from {clientEP}: {message}");
-                byte[] data = Encoding.UTF8.GetBytes(message);
-                sock.SendTo(data, clientEP);
+                var parts = Encoding.UTF8.GetString(buffer, 0, received).Split(';');
+                OnMessageReceived?.Invoke(parts);
+
+
             }
 
+        }
+
+        public void Send(string msg)
+        {
+            byte[] data = Encoding.UTF8.GetBytes(msg);
+            sock.SendTo(data, clientEP);
         }
 
     }
