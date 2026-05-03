@@ -24,5 +24,21 @@ namespace SeaBattle
         {
             InitializeComponent();
         }
+
+        public void AddLog(string msg)
+        {
+            lstLog.Items.Add(msg);
+            lstLog.ScrollIntoView(lstLog.Items[lstLog.Items.Count - 1]);
+        }
+
+        public void SetTurn(bool isMyTurn)
+        {
+            lblTurn.Content = isMyTurn ? "Ваш ход" : "Ход противника";
+        }
+
+        public void ClearLog()
+        {
+            lstLog.Items.Clear();
+        }
     }
 }
