@@ -102,10 +102,20 @@ namespace SeaBattle
 
         private void HandleReady()
         {
+            if (_state.IsReady) return;
+
+            _state.IsReady = true;
             statusPanel.AddLog($"{_state.OpponentName} готов!");
 
-            Send(GameProtocol.READY);
-            statusPanel.AddLog("Оба игрока готовы! Игра начинается.");
+            if (_server != null)
+            {
+                Send(GameProtocol.READY);
+                statusPanel.AddLog("Оба игрока готовы! Игра начинается.");
+            }
+            else
+            {
+                statusPanel.AddLog("Подключено! Ожидайте хода сервера.");
+            }
         }
 
         private void HandleShot(string[] parts)
