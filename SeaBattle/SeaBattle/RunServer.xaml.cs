@@ -19,9 +19,33 @@ namespace SeaBattle
     /// </summary>
     public partial class RunServer : Window
     {
+
+        public string UserName { get; private set; }
+        public int Port { get; private set; }
+
         public RunServer()
         {
             InitializeComponent();
         }
+
+        private void BtnStart_Click(object sender, RoutedEventArgs e)
+        {
+            if (string.IsNullOrWhiteSpace(txtName.Text))
+            {
+                MessageBox.Show("Введите имя!");
+                return;
+            }
+
+            if (!int.TryParse(txtPort.Text, out int port))
+            {
+                MessageBox.Show("Порт должен быть числом!");
+                return;
+            }
+
+            UserName = txtName.Text;
+            Port = port;
+            DialogResult = true;
+        }
+
     }
 }

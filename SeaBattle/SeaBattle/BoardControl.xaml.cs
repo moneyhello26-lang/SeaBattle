@@ -15,19 +15,25 @@ using System.Windows.Shapes;
 
 namespace SeaBattle
 {
-    /// <summary>
-    /// Логика взаимодействия для BoardControl.xaml
-    /// </summary>
     public partial class BoardControl : UserControl
     {
+
+        public event Action<int, int> OnCellClick;
+
         public BoardControl()
         {
             InitializeComponent();
         }
 
-        private void grid_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
+        private void Grid_Click(object sender, MouseButtonEventArgs e)
         {
+            var element = e.OriginalSource as FrameworkElement;
+            if (element == null) return;
 
+            int row = Grid.GetRow(element);
+            int col = Grid.GetColumn(element);
+
+            OnCellClick?.Invoke(row, col);
         }
     }
 }
