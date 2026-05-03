@@ -8,20 +8,21 @@
         Title="MainWindow" Height="450" Width="800">
     <DockPanel>
         <Menu DockPanel.Dock="Top">
-            <MenuItem Header="Игра">
+            <MenuItem Header="Игра" Click="MenuItem_Click">
                 <MenuItem Header="Создать сервер" Click="CreateServer_Click"/>
                 <MenuItem Header="Подключиться к серверу" Click="ConnectToServer_Click"/>
             </MenuItem>
-            </Menu>
-            <Grid>
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="320" />
-                    <ColumnDefinition Width="320" />
-                    <ColumnDefinition Width="*" />
-                </Grid.ColumnDefinitions>
-                <local:BoardControl x:Name="boardPlayer" Grid.Column="0" Margin="10"/>
-                <local:BoardControl x:Name="boardEnemy" Grid.Column="1" Margin="10"/>
-                <local:StatusPanel Grid.Column="2" x:Name="statusPanel" Margin="10"/> 
-            </Grid>
+        </Menu>
+        <Grid>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="320" />
+                <ColumnDefinition Width="296.428" />
+                <ColumnDefinition Width="23.572"/>
+                <ColumnDefinition Width="*" />
+            </Grid.ColumnDefinitions>
+            <local:BoardControl x:Name="boardPlayer" Grid.Column="0" Margin="10,10,10,10" Loaded="boardPlayer_Loaded"/>
+            <local:BoardControl x:Name="boardEnemy" Grid.Column="1" Margin="10,10,10,10" Loaded="boardEnemy_Loaded" Grid.ColumnSpan="2"/>
+            <local:StatusPanel Grid.Column="3" x:Name="statusPanel" Margin="10,10,10,10" Loaded="statusPanel_Loaded"/>
+        </Grid>
     </DockPanel>
 </Window>
