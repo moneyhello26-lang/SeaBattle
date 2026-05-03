@@ -76,6 +76,8 @@ namespace SeaBattle
             _state.IsMyTurn = false;
             statusPanel.SetTurn(false);
             statusPanel.AddLog("Подключение к серверу...");
+
+            _client.Send(GameProtocol.READY);
         }
 
         private void ProcessMessage(string[] parts)
@@ -101,6 +103,9 @@ namespace SeaBattle
         private void HandleReady()
         {
             statusPanel.AddLog($"{_state.OpponentName} готов!");
+
+            Send(GameProtocol.READY);
+            statusPanel.AddLog("Оба игрока готовы! Игра начинается.");
         }
 
         private void HandleShot(string[] parts)
