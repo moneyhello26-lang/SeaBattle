@@ -7,6 +7,12 @@
         mc:Ignorable="d"
         Title="RunClient" Height="450" Width="800">
     <Grid>
-        
+        <TextBox x:Name="txtName" HorizontalAlignment="Left" Margin="20,45,0,0" TextWrapping="Wrap" Text="NickName" VerticalAlignment="Top" Width="212" Height="23" TextChanged="TextBox_TextChanged"/>
+        <Label Content="Your NickName: " HorizontalAlignment="Left" Margin="20,15,0,0" VerticalAlignment="Top" Height="30" Width="106"/>
+        <TextBox x:Name="txtIP" HorizontalAlignment="Left" Margin="20,124,0,0" TextWrapping="Wrap" Text="127.0.0.1" VerticalAlignment="Top" Width="212" Height="23" TextChanged="TextBox_TextChanged_1"/>
+        <Label Content="Server IP adress " HorizontalAlignment="Left" Margin="20,94,0,0" VerticalAlignment="Top" Height="30" Width="106"/>
+        <TextBox x:Name="txtPORT" HorizontalAlignment="Left" Margin="20,201,0,0" TextWrapping="Wrap" Text="12345" VerticalAlignment="Top" Width="212" Height="23" TextChanged="TextBox_TextChanged_2"/>
+        <Label Content="Server Port " HorizontalAlignment="Left" Margin="20,171,0,0" VerticalAlignment="Top" Height="30" Width="106"/>
+        <Button Content="Connect" HorizontalAlignment="Left" Margin="20,250,0,0" VerticalAlignment="Top" Width="124" Height="24" Click="BtnConnect_Click"/>
     </Grid>
 </Window>

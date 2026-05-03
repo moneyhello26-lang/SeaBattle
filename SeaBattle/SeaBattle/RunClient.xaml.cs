@@ -19,9 +19,35 @@ namespace SeaBattle
     /// </summary>
     public partial class RunClient : Window
     {
+        public string NickName { get; private set; }
+        public string ServerIP {  get; private set; }
+        public int Port { get; private set; }
         public RunClient()
         {
             InitializeComponent();
+        }
+
+        private void TextBox_TextChanged(object sender, TextChangedEventArgs e)
+        {
+
+        }
+
+        private void TextBox_TextChanged_1(object sender, TextChangedEventArgs e)
+        {
+
+        }
+
+        private void TextBox_TextChanged_2(object sender, TextChangedEventArgs e)
+        {
+
+        }
+
+        private void BtnConnect_Click(object sender, RoutedEventArgs e)
+        {
+            NickName = txtName.Text;
+            ServerIP = txtIP.Text;
+            Port = int.Parse(txtPORT.Text);
+            DialogResult = true;
         }
     }
 }
