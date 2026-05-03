@@ -3,7 +3,7 @@
   "WorkspaceRootPath": "C:\\Users\\Stela\\Documents\\GitHub\\SeaBattle\\SeaBattle\\",
   "Documents": [
     {
-      "AbsoluteMoniker": "D:0:0:{B800AFBC-B21B-4BDB-AC64-D8686B77E6D5}|SeaBattle\\SeaBattle.csproj|C:\\Users\\Stela\\Documents\\GitHub\\SeaBattle\\SeaBattle\\seabattle\\mainwindow.xaml.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "AbsoluteMoniker": "D:0:0:{B800AFBC-B21B-4BDB-AC64-D8686B77E6D5}|SeaBattle\\SeaBattle.csproj|c:\\users\\stela\\documents\\github\\seabattle\\seabattle\\seabattle\\mainwindow.xaml.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
       "RelativeMoniker": "D:0:0:{B800AFBC-B21B-4BDB-AC64-D8686B77E6D5}|SeaBattle\\SeaBattle.csproj|solutionrelative:seabattle\\mainwindow.xaml.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
@@ -15,7 +15,7 @@
       "RelativeMoniker": "D:0:0:{B800AFBC-B21B-4BDB-AC64-D8686B77E6D5}|SeaBattle\\SeaBattle.csproj|solutionrelative:seabattle\\mainwindow.xaml||{F11ACC28-31D1-4C80-A34B-F4E09D3D753C}"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{B800AFBC-B21B-4BDB-AC64-D8686B77E6D5}|SeaBattle\\SeaBattle.csproj|c:\\users\\stela\\documents\\github\\seabattle\\seabattle\\seabattle\\statuspanel.xaml.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "AbsoluteMoniker": "D:0:0:{B800AFBC-B21B-4BDB-AC64-D8686B77E6D5}|SeaBattle\\SeaBattle.csproj|C:\\Users\\Stela\\Documents\\GitHub\\SeaBattle\\SeaBattle\\seabattle\\statuspanel.xaml.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
       "RelativeMoniker": "D:0:0:{B800AFBC-B21B-4BDB-AC64-D8686B77E6D5}|SeaBattle\\SeaBattle.csproj|solutionrelative:seabattle\\statuspanel.xaml.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
@@ -62,8 +62,7 @@
               "RelativeToolTip": "SeaBattle\\StatusPanel.xaml.cs",
               "ViewState": "AgIAABYAAAAAAAAAAAA0wCkAAAAJAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2026-05-03T15:03:13.101Z",
-              "EditorCaption": ""
+              "WhenOpened": "2026-05-03T15:03:13.101Z"
             },
             {
               "$type": "Document",
@@ -74,8 +73,7 @@
               "ToolTip": "C:\\Users\\Stela\\Documents\\GitHub\\SeaBattle\\SeaBattle\\SeaBattle\\MainWindow.xaml",
               "RelativeToolTip": "SeaBattle\\MainWindow.xaml",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.003549|",
-              "WhenOpened": "2026-05-03T13:49:02.012Z",
-              "EditorCaption": ""
+              "WhenOpened": "2026-05-03T13:49:02.012Z"
             },
             {
               "$type": "Document",
@@ -135,8 +133,7 @@
               "RelativeToolTip": "SeaBattle\\GameProtocol.cs",
               "ViewState": "AgIAAAgAAAAAAAAAAAAuwAAAAAAAAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2026-05-03T14:08:04.785Z",
-              "EditorCaption": ""
+              "WhenOpened": "2026-05-03T14:08:04.785Z"
             },
             {
               "$type": "Document",
@@ -159,8 +156,7 @@
               "ToolTip": "C:\\Users\\Stela\\Documents\\GitHub\\SeaBattle\\SeaBattle\\SeaBattle\\StatusPanel.xaml",
               "RelativeToolTip": "SeaBattle\\StatusPanel.xaml",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.003549|",
-              "WhenOpened": "2026-05-03T14:55:15.615Z",
-              "EditorCaption": ""
+              "WhenOpened": "2026-05-03T14:55:15.615Z"
             }
           ]
         }
