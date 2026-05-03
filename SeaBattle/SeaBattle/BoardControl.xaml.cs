@@ -24,5 +24,10 @@ namespace SeaBattle
         {
             InitializeComponent();
         }
+
+        private void grid_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
+        {
+
+        }
     }
 }

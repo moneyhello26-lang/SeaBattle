@@ -6,7 +6,8 @@
              xmlns:local="clr-namespace:SeaBattle"
              mc:Ignorable="d" 
              d:DesignHeight="450" d:DesignWidth="800">
-    <Grid>
-            
-    </Grid>
+    <StackPanel>
+        <Label Content="field" x:Name="lblHeader" />
+        <UniformGrid x:Name="grid" Columns="10" Rows="10" Width="300" Height="300" MouseLeftButtonDown="Grid_Click" />
+    </StackPanel>
 </UserControl>

@@ -6,7 +6,28 @@
         xmlns:local="clr-namespace:SeaBattle"
         mc:Ignorable="d"
         Title="RunServer" Height="450" Width="800">
-    <Grid>
-        
-    </Grid>
+    <StackPanel Margin="20">
+
+            <Label Content="Ваше имя:"/>
+            <TextBox x:Name="txtName"
+                 Margin="0,0,0,12"
+                 Text="Игрок 1"/>
+
+            <Label Content="Порт:"/>
+            <TextBox x:Name="txtPort"
+                 Margin="0,0,0,20"
+                 Text="5555"/>
+
+            <StackPanel Orientation="Horizontal"
+                    HorizontalAlignment="Right">
+                <Button Content="Отмена"
+                    Width="80" Margin="0,0,8,0"
+                    IsCancel="True"/>
+                <Button Content="Запустить"
+                    Width="90"
+                    IsDefault="True"
+                    Click="BtnStart_Click"/>
+            </StackPanel>
+
+        </StackPanel>
 </Window>
