@@ -26,6 +26,9 @@ namespace SeaBattle
         public string OpponentName = "Opponent";
         public string MyName = "Player";
 
+        public int HitsOnOpponent = 0;
+        public const int TotalShipCells = 20;
+
         private int[] shipSizes = { 4, 3, 3, 2, 2, 2, 1, 1, 1, 1 };
         private List<(int row, int col)>[] ships = new List<(int, int)>[10];
 

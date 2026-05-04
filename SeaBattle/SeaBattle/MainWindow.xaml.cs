@@ -216,10 +216,18 @@ namespace SeaBattle
                 statusPanel.AddLog("Ваш ход!");
             }
 
-            if (AllShipsDestroyed(_state.MyField))
+            int remaining = 0;
+            for (int i = 0; i < GameProtocol.GRID_SIZE; i++)
+                for (int j = 0; j < GameProtocol.GRID_SIZE; j++)
+                    if (_state.MyField[i, j] == CellState.Ship)
+                        remaining++;
+
+            if (remaining == 0)
             {
                 Send(GameProtocol.WIN);
-                HandleWin();
+                statusPanel.AddLog("Все ваши корабли уничтожены. Вы проиграли.");
+                MessageBox.Show("Вы проиграли!", "SeaBattle");
+                _state.IsGameOver = true;
             }
         }
 
@@ -234,8 +242,18 @@ namespace SeaBattle
             if (res == "hit" || res == "kill")
             {
                 boardEnemy.UpdateCell(row, col, CellState.Hit);
+
+                _state.HitsOnOpponent++;
+
                 _state.IsMyTurn = true;
                 statusPanel.SetTurn(true);
+
+                if (_state.HitsOnOpponent >= GameState.TotalShipCells)
+                {
+                    statusPanel.AddLog("Вы победили!");
+                    MessageBox.Show("Вы победили!", "SeaBattle");
+                    _state.IsGameOver = true;
+                }
             }
                 
             else if (res == "miss")
@@ -244,13 +262,6 @@ namespace SeaBattle
                 _state.IsMyTurn = false;
                 statusPanel.SetTurn(false);
                 statusPanel.AddLog("Ход противника");
-            }
-
-            if (AllShipsDestroyed(_state.OpponentField))
-            {
-                statusPanel.AddLog("Вы победили!");
-                MessageBox.Show("Вы победили!", "SeaBattle");
-                _state.IsGameOver = true;
             }
         }
 
