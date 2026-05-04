@@ -20,8 +20,8 @@
                 <ColumnDefinition Width="*"/>
             </Grid.ColumnDefinitions>
 
-            <local:BoardControl x:Name="boardPlayer" Grid.Column="0" Margin="10"/>
-            <local:BoardControl x:Name="boardEnemy"  Grid.Column="1" Margin="10"/>
+            <local:BoardControl x:Name="boardPlayer" Grid.Column="0"/>
+            <local:BoardControl x:Name="boardEnemy"  Grid.Column="1"/>
             <local:StatusPanel  x:Name="statusPanel" Grid.Column="2" Margin="10"/>
         </Grid>
     </DockPanel>
