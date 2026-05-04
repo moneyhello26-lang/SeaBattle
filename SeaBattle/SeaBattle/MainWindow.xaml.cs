@@ -149,7 +149,6 @@ namespace SeaBattle
             statusPanel.SetTurn(false);
             statusPanel.AddLog("Подключено. Разместите корабли и нажмите 'Готов'.");
 
-            // НЕ отправляем READY автоматически — ждём ручного нажатия 'Готов'
         }
 
         private void ProcessMessage(string[] parts)
@@ -180,7 +179,6 @@ namespace SeaBattle
             if (_state.IsReady && _opponentReady)
             {
                 statusPanel.AddLog("Оба игрока готовы! Игра начинается.");
-                // ход уже определён при создании/подключении (_state.IsMyTurn)
             }
             else
             {
@@ -195,19 +193,15 @@ namespace SeaBattle
 
             statusPanel.AddLog($"{_state.OpponentName} стреляет в ({row}, {col})");
 
-            // Обработка выстрела противника
             var (isHit, isKill) = _state.ProcessOpponentShot(row, col);
 
-            // Обновляем доску игрока
             boardPlayer.UpdateCell(row, col, _state.MyField[row, col]);
 
             string result = isKill ? "kill" : isHit ? "hit" : "miss";
             statusPanel.AddLog($"Результат: {result}");
 
-            // Отправляем результат
-            Send($"{GameProtocol.RESULT} {row} {col} {result}");
+            Send($"{GameProtocol.RESULT};{row};{col};{result}");
 
-            // Переход хода
             if (!isHit)
             {
                 _state.IsMyTurn = true;
@@ -215,7 +209,6 @@ namespace SeaBattle
                 statusPanel.AddLog("Ваш ход!");
             }
 
-            // Проверка победы
             if (AllShipsDestroyed(_state.MyField))
             {
                 Send(GameProtocol.WIN);
@@ -232,7 +225,12 @@ namespace SeaBattle
             statusPanel.AddLog($"Результат выстрела в ({row}, {col}): {res}");
 
             if (res == "hit" || res == "kill")
+            {
                 boardEnemy.UpdateCell(row, col, CellState.Hit);
+                _state.IsMyTurn = true;
+                statusPanel.SetTurn(true);
+            }
+                
             else if (res == "miss")
             {
                 boardEnemy.UpdateCell(row, col, CellState.Miss);
@@ -272,13 +270,11 @@ namespace SeaBattle
 
             var (isHit, isKill) = _state.Shoot(row, col);
 
-            // Обновляем визуально доску противника
             boardEnemy.UpdateCell(row, col, _state.OpponentField[row, col]);
 
             statusPanel.AddLog($"Выстрел в ({row}, {col})");
 
-            // Отправляем выстрел на сервер
-            Send($"{GameProtocol.SHOT} {row} {col}");
+            Send($"{GameProtocol.SHOT};{row};{col}");
 
             if (!isHit)
             {
