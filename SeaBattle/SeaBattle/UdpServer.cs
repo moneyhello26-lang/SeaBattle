@@ -41,6 +41,10 @@ namespace SeaBattle
 
         public void Send(string msg)
         {
+            if (clientEP == null || ((IPEndPoint)clientEP).Address.Equals(IPAddress.Any))
+            {
+                return;
+            }
             byte[] data = Encoding.UTF8.GetBytes(msg);
             sock.SendTo(data, clientEP);
         }
