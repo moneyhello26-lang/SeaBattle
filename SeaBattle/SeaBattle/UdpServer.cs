@@ -30,13 +30,20 @@ namespace SeaBattle
             byte[] buffer = new byte[1024];
             while (true)
             {
-                int received = sock.ReceiveFrom(buffer, ref clientEP);
-                var parts = Encoding.UTF8.GetString(buffer, 0, received).Split(';');
-                OnMessageReceived?.Invoke(parts);
-
-
+                try
+                {
+                    int received = sock.ReceiveFrom(buffer, ref clientEP);
+                    string msg = Encoding.UTF8.GetString(buffer, 0, received);
+                    var parts = msg.Split(new[] { ';' }, StringSplitOptions.RemoveEmptyEntries);
+                    
+                    if (parts.Length > 0)
+                        OnMessageReceived?.Invoke(parts);
+                }
+                catch (Exception ex)
+                {
+                    System.Diagnostics.Debug.WriteLine($"UdpServer error: {ex.Message}");
+                }
             }
-
         }
 
         public void Send(string msg)
@@ -48,6 +55,5 @@ namespace SeaBattle
             byte[] data = Encoding.UTF8.GetBytes(msg);
             sock.SendTo(data, clientEP);
         }
-
     }
 }

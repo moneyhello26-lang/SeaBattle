@@ -30,15 +30,32 @@ namespace SeaBattle
 
             while (true)
             {
-                int n = _sock.ReceiveFrom(buf, ref ep);
-                var parts = Encoding.UTF8.GetString(buf, 0, n).Split(';');
-                OnMessageReceived?.Invoke(parts);
+                try
+                {
+                    int n = _sock.ReceiveFrom(buf, ref ep);
+                    string msg = Encoding.UTF8.GetString(buf, 0, n);
+                    var parts = msg.Split(new[] { ';' }, StringSplitOptions.RemoveEmptyEntries);
+                    
+                    if (parts.Length > 0)
+                        OnMessageReceived?.Invoke(parts);
+                }
+                catch (Exception ex)
+                {
+                    System.Diagnostics.Debug.WriteLine($"UdpClient error: {ex.Message}");
+                }
             }
         }
+
         public void Send(string msg)
         {
-            _sock.Send(Encoding.UTF8.GetBytes(msg));
+            try
+            {
+                _sock.Send(Encoding.UTF8.GetBytes(msg));
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine($"UdpClient send error: {ex.Message}");
+            }
         }
-
     }
 }

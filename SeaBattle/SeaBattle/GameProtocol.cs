@@ -13,9 +13,14 @@ namespace SeaBattle
         public const string SHOT = "shot";
         public const string RESULT = "result";
         public const string WIN = "win";
-        
+        public const string START_GAME = "start_game";
 
         public const int GRID_SIZE = 10;
         public const int PORT = 12345;
+
+        public static string FormatMessage(params string[] parts)
+        {
+            return string.Join(";", parts);
+        }
     }
 }

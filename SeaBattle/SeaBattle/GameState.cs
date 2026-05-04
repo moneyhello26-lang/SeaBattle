@@ -56,7 +56,39 @@ namespace SeaBattle
             {
                 ships[i] = new List<(int, int)>();
             }
-        }     
+        }
+
+        public bool PlaceShipsAutomatically()
+        {
+            InitializeField();
+            InitializeShips();
+            Random random = new Random();
+
+            for (int shipIndex = 0; shipIndex < shipSizes.Length; shipIndex++)
+            {
+                int size = shipSizes[shipIndex];
+                bool placed = false;
+
+                for (int attempts = 0; attempts < 100; attempts++)
+                {
+                    bool isHorizontal = random.Next(2) == 0;
+                    int row = random.Next(GameProtocol.GRID_SIZE);
+                    int col = random.Next(GameProtocol.GRID_SIZE);
+
+                    if (CanPlaceShip(row, col, size, isHorizontal))
+                    {
+                        PlaceShip(shipIndex, row, col, size, isHorizontal);
+                        placed = true;
+                        break;
+                    }
+                }
+
+                if (!placed)
+                    return false;
+            }
+
+            return true;
+        }
 
         private bool CanPlaceShip(int row, int col, int size, bool isHorizontal)
         {
@@ -183,6 +215,31 @@ namespace SeaBattle
         {
             InitializeField();
             InitializeShips();
+            HitsOnOpponent = 0;
+        }
+
+        public void ApplyOpponentResult(int row, int col, string result)
+        {
+            if (row < 0 || row >= GameProtocol.GRID_SIZE || col < 0 || col >= GameProtocol.GRID_SIZE)
+                return;
+
+            if (result == "hit" || result == "kill")
+            {
+                if (OpponentField[row, col] != CellState.Hit)
+                {
+                    OpponentField[row, col] = CellState.Hit;
+                    HitsOnOpponent++;
+                }
+            }
+            else if (result == "miss")
+            {
+                OpponentField[row, col] = CellState.Miss;
+            }
+        }
+
+        public bool IsOpponentDefeated()
+        {
+            return HitsOnOpponent >= TotalShipCells;
         }
 
         public (bool isHit, bool isKill) Shoot(int row, int col)

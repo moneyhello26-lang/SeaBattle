@@ -13,13 +13,13 @@ namespace SeaBattle
         private bool _placementMode = true;
         private bool _placementHorizontal = true;
         private bool _opponentReady = false;
+        private bool _gameStarted = false;
 
         public MainWindow()
         {
             InitializeComponent();
 
             boardPlayer.OnCellClick += BoardPlayer_OnCellClick;
-            boardPlayer.OnCellRightClick += BoardPlayer_OnCellRightClick;
             boardEnemy.OnCellClick += BoardEnemy_OnCellClick;
 
             InitializePlacementUI();
@@ -28,7 +28,15 @@ namespace SeaBattle
         private void InitializePlacementUI()
         {
             UpdateShipList();
-            statusPanel.AddLog("Разместите корабли. ЛКМ — поставить, ПКМ — удалить.");
+            SetPlacementControlsEnabled(true);
+            statusPanel.AddLog("Разместите корабли. ЛКМ — поставить");
+        }
+
+        private void SetPlacementControlsEnabled(bool enabled)
+        {
+            lstShips.IsEnabled = enabled;
+            btnRotate.IsEnabled = enabled;
+            btnClear.IsEnabled = enabled;
         }
 
         private void UpdateShipList()
@@ -66,28 +74,14 @@ namespace SeaBattle
             {
                 RenderPlayerBoard();
                 UpdateShipList();
-                statusPanel.AddLog($"Поставлен {size}-палубный корабль в ({row},{col}) {(_placementHorizontal ? "гор." : "вер.")}");
+                statusPanel.AddLog($"Поставлен {size}-палубный корабль в ({row},{col}) {(_placementHorizontal ? "гор." : "верт.")}");
 
                 if (_state.IsPlacementComplete())
-                    statusPanel.AddLog("Все корабли размещены. Нажмите 'Готов'.");
+                    statusPanel.AddLog("Все корабли размещены. Нажмите 'Готов'.");        
             }
             else
             {
                 statusPanel.AddLog("Нельзя разместить корабль в этой позиции.");
-            }
-        }
-
-        private void BoardPlayer_OnCellRightClick(int row, int col)
-        {
-            if (_state.RemoveShipAt(row, col))
-            {
-                RenderPlayerBoard();
-                UpdateShipList();
-                statusPanel.AddLog($"Удалён корабль в ({row},{col})");
-            }
-            else
-            {
-                statusPanel.AddLog("В этой клетке нет вашего корабля.");
             }
         }
 
@@ -99,6 +93,8 @@ namespace SeaBattle
 
         private void BtnClear_Click(object sender, RoutedEventArgs e)
         {
+            if (!btnClear.IsEnabled) return;
+
             _state.ClearPlacement();
             RenderPlayerBoard();
             UpdateShipList();
@@ -113,16 +109,15 @@ namespace SeaBattle
                 return;
             }
 
-            if (_server == null && _client == null)
-            {
-                statusPanel.AddLog("Сначала создайте сервер или подключитесь!");
-                return;
-            }
-
             _placementMode = false;
             _state.IsReady = true;
+
+            SetPlacementControlsEnabled(false);
+            btnReady.IsEnabled = false;
+
             statusPanel.AddLog("Вы готовы. Ожидание противника...");
-            Send(GameProtocol.READY);
+
+            Send(GameProtocol.FormatMessage(GameProtocol.READY, _state.MyName));
         }
 
         private void CreateServer_Click(object sender, RoutedEventArgs e)
@@ -145,7 +140,6 @@ namespace SeaBattle
         {
             var dlg = new RunClient();
             if (dlg.ShowDialog() != true) return;
-
             _state.MyName = dlg.NickName;
             _client = new UdpClient();
             _client.OnMessageReceived += ProcessMessage;
@@ -160,50 +154,84 @@ namespace SeaBattle
         {
             Dispatcher.Invoke(() =>
             {
-                switch (parts[0])
+                try
                 {
-                    case GameProtocol.READY: HandleReady(); break;
-                    case GameProtocol.SHOT: HandleShot(parts); break;
-                    case GameProtocol.RESULT: HandleResult(parts); break;
-                    case GameProtocol.WIN: HandleWin(); break;
+                    if (parts == null || parts.Length == 0) return;
+
+                    var cmd = parts[0].Trim().ToLowerInvariant();
+
+                    if (cmd == GameProtocol.READY)
+                        HandleReady(parts);
+                    else if (cmd == GameProtocol.START_GAME)
+                        HandleStartGame();
+                    else if (cmd == GameProtocol.SHOT)
+                        HandleShot(parts);
+                    else if (cmd == GameProtocol.RESULT)
+                        HandleResult(parts);
+                    else if (cmd == GameProtocol.WIN)
+                        HandleWin();
+                    else
+                        statusPanel.AddLog($"Неизвестная команда: {parts[0]}");
+                }
+                catch (Exception ex)
+                {
+                    statusPanel.AddLog($"Ошибка при обработке сообщения: {ex.Message}");
                 }
             });
         }
 
         private void Send(string msg)
         {
-            _server?.Send(msg);
-            _client?.Send(msg);
+            try
+            {
+                _server?.Send(msg);
+                _client?.Send(msg);
+            }
+            catch (Exception ex)
+            {
+                statusPanel.AddLog($"Ошибка при отправке: {ex.Message}");
+            }
         }
 
-        private void HandleReady()
+        private void HandleReady(string[] parts)
         {
             if (_opponentReady) return;
 
             _opponentReady = true;
-            statusPanel.AddLog("Противник готов.");
 
-            if (_state.IsReady && _opponentReady)
+            if (parts.Length > 1 && !string.IsNullOrWhiteSpace(parts[1]))
+                _state.OpponentName = parts[1];
+
+            statusPanel.AddLog($"{_state.OpponentName} готов.");
+
+            if (_state.IsReady && _opponentReady && _server != null)
             {
-                statusPanel.AddLog("Оба игрока готовы! Игра начинается.");
-
-                if (_server != null)
-                {
-                    _state.IsMyTurn = true;
-                    statusPanel.SetTurn(true);
-                    statusPanel.AddLog("Ваш ход — вы сервер!");
-                }
-                else
-                {
-                    _state.IsMyTurn = false;
-                    statusPanel.SetTurn(false);
-                    statusPanel.AddLog("Ход противника — вы клиент.");
-                }
+                Send(GameProtocol.FormatMessage(GameProtocol.START_GAME));
+                StartGameSession();
             }
             else
             {
-                statusPanel.AddLog("Ожидание вашей готовности...");
+                statusPanel.AddLog("Ожидание готовности другой стороны...");
             }
+        }
+
+        private void HandleStartGame()
+        {
+            if (_gameStarted) return;
+            StartGameSession();
+        }
+
+        private void StartGameSession()
+        {
+            _gameStarted = true;
+            _placementMode = false;
+
+            SetPlacementControlsEnabled(false);
+            btnReady.IsEnabled = false;
+
+            statusPanel.AddLog("Оба игрока готовы! Игра начинается.");
+            statusPanel.SetTurn(_state.IsMyTurn);
+            statusPanel.AddLog(_state.IsMyTurn ? "Ваш ход!" : "Ход противника.");
         }
 
         private void HandleShot(string[] parts)
@@ -213,7 +241,7 @@ namespace SeaBattle
             int row = int.Parse(parts[1]);
             int col = int.Parse(parts[2]);
 
-            statusPanel.AddLog($"Противник стреляет в ({row}, {col})");
+            statusPanel.AddLog($"{_state.OpponentName} стреляет в ({row}, {col})");
 
             var (isHit, isKill) = _state.ProcessOpponentShot(row, col);
             boardPlayer.UpdateCell(row, col, _state.MyField[row, col]);
@@ -221,7 +249,7 @@ namespace SeaBattle
             string result = isKill ? "kill" : isHit ? "hit" : "miss";
             statusPanel.AddLog($"Результат: {result}");
 
-            Send($"{GameProtocol.RESULT};{row};{col};{result}");
+            Send(GameProtocol.FormatMessage(GameProtocol.RESULT, row.ToString(), col.ToString(), result));
 
             if (!isHit)
             {
@@ -230,18 +258,10 @@ namespace SeaBattle
                 statusPanel.AddLog("Ваш ход!");
             }
 
-            int remaining = 0;
-            for (int i = 0; i < GameProtocol.GRID_SIZE; i++)
-                for (int j = 0; j < GameProtocol.GRID_SIZE; j++)
-                    if (_state.MyField[i, j] == CellState.Ship)
-                        remaining++;
-
-            if (remaining == 0)
+            if (AllShipsDestroyed(_state.MyField))
             {
-                Send(GameProtocol.WIN);
-                statusPanel.AddLog("Все ваши корабли уничтожены.");
-                MessageBox.Show("Вы проиграли!", "SeaBattle");
-                _state.IsGameOver = true;
+                Send(GameProtocol.FormatMessage(GameProtocol.WIN));
+                HandleWin();
             }
         }
 
@@ -255,21 +275,14 @@ namespace SeaBattle
 
             statusPanel.AddLog($"Результат выстрела в ({row}, {col}): {res}");
 
+            _state.ApplyOpponentResult(row, col, res);
+
             if (res == "hit" || res == "kill")
             {
                 boardEnemy.UpdateCell(row, col, CellState.Hit);
-                _state.HitsOnOpponent++;
-
+                statusPanel.AddLog("Попадание!");
                 _state.IsMyTurn = true;
                 statusPanel.SetTurn(true);
-                statusPanel.AddLog("Попадание! Стреляйте ещё.");
-
-                if (_state.HitsOnOpponent >= GameState.TotalShipCells)
-                {
-                    statusPanel.AddLog("Вы победили!");
-                    MessageBox.Show("Вы победили!", "SeaBattle");
-                    _state.IsGameOver = true;
-                }
             }
             else
             {
@@ -278,47 +291,75 @@ namespace SeaBattle
                 statusPanel.SetTurn(false);
                 statusPanel.AddLog("Промах. Ход противника.");
             }
+
+            boardEnemy.IsEnabled = !_state.IsGameOver;
+
+            if (_state.IsOpponentDefeated())
+            {
+                statusPanel.AddLog("Вы победили!");
+                Send(GameProtocol.FormatMessage(GameProtocol.WIN));
+                MessageBox.Show("Вы победили!", "SeaBattle");
+                _state.IsGameOver = true;
+                boardEnemy.IsEnabled = false;
+            }
         }
 
         private void HandleWin()
         {
-            statusPanel.AddLog("Игра окончена! Противник победил.");
+            statusPanel.AddLog($"Игра окончена! Противник победил.");
             MessageBox.Show("Вы проиграли!", "SeaBattle");
             _state.IsGameOver = true;
+            boardEnemy.IsEnabled = false;
         }
 
         private void BoardEnemy_OnCellClick(int row, int col)
         {
-            if (!_state.IsReady || !_opponentReady)
+            if (!_gameStarted)
             {
-                statusPanel.AddLog("Ожидается готовность обоих игроков.");
+                statusPanel.AddLog("Игра ещё не началась.");
                 return;
             }
 
-            if (_state.IsGameOver)
-            {
-                statusPanel.AddLog("Игра окончена!");
-                return;
-            }
-
-            if (!_state.IsMyTurn)
+            if (!_state.IsMyTurn || _state.IsGameOver)
             {
                 statusPanel.AddLog("Это не ваш ход!");
                 return;
             }
 
-            statusPanel.AddLog($"Выстрел в ({row}, {col})");
-            Send($"{GameProtocol.SHOT};{row};{col}");
+            if (_state.OpponentField[row, col] == CellState.Hit || _state.OpponentField[row, col] == CellState.Miss)
+            {
+                statusPanel.AddLog("Вы уже стреляли в эту клетку.");
+                return;
+            }
 
-            _state.IsMyTurn = false;
-            statusPanel.SetTurn(false);
+            Send(GameProtocol.FormatMessage(GameProtocol.SHOT, row.ToString(), col.ToString()));
+            statusPanel.AddLog($"Выстрел отправлен в ({row}, {col}). Ожидаем результат...");
+
+            boardEnemy.IsEnabled = false;
         }
 
         private void RenderPlayerBoard()
         {
             for (int i = 0; i < GameProtocol.GRID_SIZE; i++)
+            {
                 for (int j = 0; j < GameProtocol.GRID_SIZE; j++)
+                {
                     boardPlayer.UpdateCell(i, j, _state.MyField[i, j]);
+                }
+            }
+        }
+
+        private bool AllShipsDestroyed(CellState[,] field)
+        {
+            for (int i = 0; i < GameProtocol.GRID_SIZE; i++)
+            {
+                for (int j = 0; j < GameProtocol.GRID_SIZE; j++)
+                {
+                    if (field[i, j] == CellState.Ship)
+                        return false;
+                }
+            }
+            return true;
         }
     }
 }
