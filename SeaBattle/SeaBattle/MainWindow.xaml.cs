@@ -18,7 +18,6 @@ namespace SeaBattle
         {
             InitializeComponent();
 
-            // подписываемся на клики досок
             boardPlayer.OnCellClick += BoardPlayer_OnCellClick;
             boardPlayer.OnCellRightClick += BoardPlayer_OnCellRightClick;
             boardEnemy.OnCellClick += BoardEnemy_OnCellClick;
@@ -70,7 +69,7 @@ namespace SeaBattle
                 statusPanel.AddLog($"Поставлен {size}-палубный корабль в ({row},{col}) {(_placementHorizontal ? "гор." : "вер.")}");
 
                 if (_state.IsPlacementComplete())
-                    statusPanel.AddLog("Все корабли размещены. Нажмите 'Готов'."); 
+                    statusPanel.AddLog("Все корабли размещены. Нажмите 'Готов'.");
             }
             else
             {
@@ -120,7 +119,6 @@ namespace SeaBattle
                 return;
             }
 
-
             _placementMode = false;
             _state.IsReady = true;
             statusPanel.AddLog("Вы готовы. Ожидание противника...");
@@ -147,6 +145,7 @@ namespace SeaBattle
         {
             var dlg = new RunClient();
             if (dlg.ShowDialog() != true) return;
+
             _state.MyName = dlg.NickName;
             _client = new UdpClient();
             _client.OnMessageReceived += ProcessMessage;
@@ -155,7 +154,6 @@ namespace SeaBattle
             _state.IsMyTurn = false;
             statusPanel.SetTurn(false);
             statusPanel.AddLog("Подключено. Разместите корабли и нажмите 'Готов'.");
-
         }
 
         private void ProcessMessage(string[] parts)
@@ -180,28 +178,44 @@ namespace SeaBattle
 
         private void HandleReady()
         {
+            if (_opponentReady) return;
+
             _opponentReady = true;
-            statusPanel.AddLog($"{_state.OpponentName} готов.");
+            statusPanel.AddLog("Противник готов.");
 
             if (_state.IsReady && _opponentReady)
             {
                 statusPanel.AddLog("Оба игрока готовы! Игра начинается.");
+
+                if (_server != null)
+                {
+                    _state.IsMyTurn = true;
+                    statusPanel.SetTurn(true);
+                    statusPanel.AddLog("Ваш ход — вы сервер!");
+                }
+                else
+                {
+                    _state.IsMyTurn = false;
+                    statusPanel.SetTurn(false);
+                    statusPanel.AddLog("Ход противника — вы клиент.");
+                }
             }
             else
             {
-                statusPanel.AddLog("Ожидание готовности другой стороны...");
+                statusPanel.AddLog("Ожидание вашей готовности...");
             }
         }
 
         private void HandleShot(string[] parts)
         {
+            if (parts.Length < 3) return;
+
             int row = int.Parse(parts[1]);
             int col = int.Parse(parts[2]);
 
-            statusPanel.AddLog($"{_state.OpponentName} стреляет в ({row}, {col})");
+            statusPanel.AddLog($"Противник стреляет в ({row}, {col})");
 
             var (isHit, isKill) = _state.ProcessOpponentShot(row, col);
-
             boardPlayer.UpdateCell(row, col, _state.MyField[row, col]);
 
             string result = isKill ? "kill" : isHit ? "hit" : "miss";
@@ -225,7 +239,7 @@ namespace SeaBattle
             if (remaining == 0)
             {
                 Send(GameProtocol.WIN);
-                statusPanel.AddLog("Все ваши корабли уничтожены. Вы проиграли.");
+                statusPanel.AddLog("Все ваши корабли уничтожены.");
                 MessageBox.Show("Вы проиграли!", "SeaBattle");
                 _state.IsGameOver = true;
             }
@@ -233,6 +247,8 @@ namespace SeaBattle
 
         private void HandleResult(string[] parts)
         {
+            if (parts.Length < 4) return;
+
             int row = int.Parse(parts[1]);
             int col = int.Parse(parts[2]);
             string res = parts[3];
@@ -242,11 +258,11 @@ namespace SeaBattle
             if (res == "hit" || res == "kill")
             {
                 boardEnemy.UpdateCell(row, col, CellState.Hit);
-
                 _state.HitsOnOpponent++;
 
                 _state.IsMyTurn = true;
                 statusPanel.SetTurn(true);
+                statusPanel.AddLog("Попадание! Стреляйте ещё.");
 
                 if (_state.HitsOnOpponent >= GameState.TotalShipCells)
                 {
@@ -255,7 +271,6 @@ namespace SeaBattle
                     _state.IsGameOver = true;
                 }
             }
-                
             else
             {
                 boardEnemy.UpdateCell(row, col, CellState.Miss);
@@ -267,7 +282,7 @@ namespace SeaBattle
 
         private void HandleWin()
         {
-            statusPanel.AddLog($"Игра окончена! Противник победил.");
+            statusPanel.AddLog("Игра окончена! Противник победил.");
             MessageBox.Show("Вы проиграли!", "SeaBattle");
             _state.IsGameOver = true;
         }
@@ -280,18 +295,19 @@ namespace SeaBattle
                 return;
             }
 
-            if (!_state.IsMyTurn || _state.IsGameOver)
+            if (_state.IsGameOver)
+            {
+                statusPanel.AddLog("Игра окончена!");
+                return;
+            }
+
+            if (!_state.IsMyTurn)
             {
                 statusPanel.AddLog("Это не ваш ход!");
                 return;
             }
 
-            var (isHit, isKill) = _state.Shoot(row, col);
-
-            boardEnemy.UpdateCell(row, col, _state.OpponentField[row, col]);
-
             statusPanel.AddLog($"Выстрел в ({row}, {col})");
-
             Send($"{GameProtocol.SHOT};{row};{col}");
 
             _state.IsMyTurn = false;
@@ -301,12 +317,8 @@ namespace SeaBattle
         private void RenderPlayerBoard()
         {
             for (int i = 0; i < GameProtocol.GRID_SIZE; i++)
-            {
                 for (int j = 0; j < GameProtocol.GRID_SIZE; j++)
-                {
                     boardPlayer.UpdateCell(i, j, _state.MyField[i, j]);
-                }
-            }
         }
     }
 }
