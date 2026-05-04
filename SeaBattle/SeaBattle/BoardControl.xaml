@@ -8,6 +8,8 @@
              d:DesignHeight="450" d:DesignWidth="800">
     <StackPanel>
         <Label Content="FIELD" x:Name="lblHeader" />
-        <UniformGrid x:Name="grid" Columns="10" Rows="10" Width="300" Height="300" MouseLeftButtonDown="Grid_Click" />
+        <UniformGrid x:Name="grid" Columns="10" Rows="10" Width="300" Height="300"
+                     MouseLeftButtonDown="Grid_Click"
+                     MouseRightButtonDown="Grid_RightClick" />
     </StackPanel>
 </UserControl>

@@ -5,20 +5,16 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
 using System.Windows.Input;
 using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
 using System.Windows.Shapes;
 
 namespace SeaBattle
 {
     public partial class BoardControl : UserControl
     {
-
         public event Action<int, int> OnCellClick;
+        public event Action<int, int> OnCellRightClick;
 
         public BoardControl()
         {
@@ -28,6 +24,7 @@ namespace SeaBattle
 
         private void BuildGrid()
         {
+            grid.Children.Clear();
             for (int i = 0; i < GameProtocol.GRID_SIZE * GameProtocol.GRID_SIZE; i++)
             {
                 var rect = new Rectangle
@@ -60,13 +57,31 @@ namespace SeaBattle
 
         private void Grid_Click(object sender, MouseButtonEventArgs e)
         {
-            var element = e.OriginalSource as FrameworkElement;
+            var element = e.OriginalSource as UIElement;
             if (element == null) return;
 
-            int row = Grid.GetRow(element);
-            int col = Grid.GetColumn(element);
+            int index = grid.Children.IndexOf(element);
+            if (index < 0) return;
+
+            int row = index / GameProtocol.GRID_SIZE;
+            int col = index % GameProtocol.GRID_SIZE;
 
             OnCellClick?.Invoke(row, col);
+        }
+
+        private void Grid_RightClick(object sender, MouseButtonEventArgs e)
+        {
+            var element = e.OriginalSource as UIElement;
+            if (element == null) return;
+
+            int index = grid.Children.IndexOf(element);
+            if (index < 0) return;
+
+            int row = index / GameProtocol.GRID_SIZE;
+            int col = index % GameProtocol.GRID_SIZE;
+
+            OnCellRightClick?.Invoke(row, col);
+            e.Handled = true;
         }
     }
 }

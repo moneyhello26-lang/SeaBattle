@@ -22,7 +22,22 @@
 
             <local:BoardControl x:Name="boardPlayer" Grid.Column="0"/>
             <local:BoardControl x:Name="boardEnemy"  Grid.Column="1"/>
-            <local:StatusPanel  x:Name="statusPanel" Grid.Column="2" Margin="10"/>
+
+            <StackPanel Grid.Column="2" Margin="10">
+                <GroupBox Header="Размещение кораблей">
+                    <StackPanel>
+                        <ListBox x:Name="lstShips" Height="120" />
+                        <StackPanel Orientation="Horizontal" Margin="0,6,0,0">
+                            <Button x:Name="btnRotate" Click="BtnRotate_Click" Margin="0,0,6,0">Ориентация: Гор.</Button>
+                            <Button x:Name="btnClear" Click="BtnClear_Click" Margin="0,0,6,0">Очистить</Button>
+                            <Button x:Name="btnReady" Click="BtnReady_Click">Готов</Button>
+                        </StackPanel>
+                        <TextBlock Text="ЛКМ — поставить; ПКМ — удалить" FontStyle="Italic" Margin="0,6,0,0"/>
+                    </StackPanel>
+                </GroupBox>
+
+                <local:StatusPanel  x:Name="statusPanel" Margin="0,10,0,0"/>
+            </StackPanel>
         </Grid>
     </DockPanel>
 </Window>

@@ -17,17 +17,17 @@ namespace SeaBattle
     internal class GameState
     {
         public CellState[,] MyField = new CellState[GameProtocol.GRID_SIZE, GameProtocol.GRID_SIZE];
-
         public CellState[,] OpponentField = new CellState[GameProtocol.GRID_SIZE, GameProtocol.GRID_SIZE];
-
-        private int[] shipSizes = { 4, 3, 3, 2, 2, 2, 1, 1, 1, 1 };
-        private List<(int row, int col)>[] ships = new List<(int, int)>[10];
 
         public bool IsMyTurn = false;
         public bool IsGameOver = false;
         public bool IsReady = false;
+
         public string OpponentName = "Opponent";
         public string MyName = "Player";
+
+        private int[] shipSizes = { 4, 3, 3, 2, 2, 2, 1, 1, 1, 1 };
+        private List<(int row, int col)>[] ships = new List<(int, int)>[10];
 
         public GameState()
         {
@@ -53,7 +53,7 @@ namespace SeaBattle
             {
                 ships[i] = new List<(int, int)>();
             }
-        }
+        }     
 
         private bool CanPlaceShip(int row, int col, int size, bool isHorizontal)
         {
@@ -120,6 +120,68 @@ namespace SeaBattle
                 }
             }
         }
+
+        public bool TryPlaceShip(int size, int row, int col, bool isHorizontal)
+        {
+            if (!CanPlaceShip(row, col, size, isHorizontal))
+                return false;
+
+            for (int i = 0; i < shipSizes.Length; i++)
+            {
+                if (shipSizes[i] == size && ships[i].Count == 0)
+                {
+                    PlaceShip(i, row, col, size, isHorizontal);
+                    return true;
+                }
+            }
+
+            return false;
+        }
+
+        public bool RemoveShipAt(int row, int col)
+        {
+            for (int i = 0; i < ships.Length; i++)
+            {
+                var list = ships[i];
+                if (list.Count == 0) continue;
+                foreach (var cell in list)
+                {
+                    if (cell.row == row && cell.col == col)
+                    {
+                        foreach (var c in list)
+                            MyField[c.row, c.col] = CellState.Empty;
+                        list.Clear();
+                        return true;
+                    }
+                }
+            }
+            return false;
+        }
+
+        public List<int> GetRemainingShipSizes()
+        {
+            var res = new List<int>();
+            for (int i = 0; i < shipSizes.Length; i++)
+            {
+                if (ships[i].Count == 0)
+                    res.Add(shipSizes[i]);
+            }
+            return res;
+        }
+
+        public bool IsPlacementComplete()
+        {
+            for (int i = 0; i < ships.Length; i++)
+                if (ships[i].Count == 0) return false;
+            return true;
+        }
+
+        public void ClearPlacement()
+        {
+            InitializeField();
+            InitializeShips();
+        }
+
         public (bool isHit, bool isKill) Shoot(int row, int col)
         {
             if (row < 0 || row >= GameProtocol.GRID_SIZE || col < 0 || col >= GameProtocol.GRID_SIZE)
@@ -224,14 +286,5 @@ namespace SeaBattle
 
             return true;
         }
-
-
-
     }
-
-
 }
-        
-
-
-
