@@ -256,12 +256,12 @@ namespace SeaBattle
                 }
             }
                 
-            else if (res == "miss")
+            else
             {
                 boardEnemy.UpdateCell(row, col, CellState.Miss);
                 _state.IsMyTurn = false;
                 statusPanel.SetTurn(false);
-                statusPanel.AddLog("Ход противника");
+                statusPanel.AddLog("Промах. Ход противника.");
             }
         }
 
@@ -294,11 +294,8 @@ namespace SeaBattle
 
             Send($"{GameProtocol.SHOT};{row};{col}");
 
-            if (!isHit)
-            {
-                _state.IsMyTurn = false;
-                statusPanel.SetTurn(false);
-            }
+            _state.IsMyTurn = false;
+            statusPanel.SetTurn(false);
         }
 
         private void RenderPlayerBoard()
@@ -310,19 +307,6 @@ namespace SeaBattle
                     boardPlayer.UpdateCell(i, j, _state.MyField[i, j]);
                 }
             }
-        }
-
-        private bool AllShipsDestroyed(CellState[,] field)
-        {
-            for (int i = 0; i < GameProtocol.GRID_SIZE; i++)
-            {
-                for (int j = 0; j < GameProtocol.GRID_SIZE; j++)
-                {
-                    if (field[i, j] == CellState.Ship)
-                        return false;
-                }
-            }
-            return true;
         }
     }
 }
