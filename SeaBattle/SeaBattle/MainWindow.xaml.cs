@@ -114,6 +114,13 @@ namespace SeaBattle
                 return;
             }
 
+            if (_server == null && _client == null)
+            {
+                statusPanel.AddLog("Сначала создайте сервер или подключитесь!");
+                return;
+            }
+
+
             _placementMode = false;
             _state.IsReady = true;
             statusPanel.AddLog("Вы готовы. Ожидание противника...");
